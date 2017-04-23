@@ -2,7 +2,8 @@
 
 import linecache
 
-#=============Funkcje sprawdzajace format ================================================
+
+# =============Funkcje sprawdzajace format ================================================
 
 def czy_BPseq():
     wynik = 1
@@ -16,7 +17,7 @@ def czy_BPseq():
     while (i == nr_nuk):
         i = i + 1
         nuk = linecache.getline(nazwa_czasteczki, i)
-        if (len(nuk)==0):
+        if (len(nuk) == 0):
             nr_nuk = 0
         else:
             nr_nuk = int(nuk[0]);
@@ -35,6 +36,7 @@ def czy_BPseq():
 
     return wynik
 
+
 def czy_DotBracket():
     wynik = 1
     sek = linecache.getline(nazwa_czasteczki, 1)  # wyciaganie pojedynczych linijek
@@ -48,6 +50,7 @@ def czy_DotBracket():
         if (i != '.' and i != '(' and i != ')' and i != '{' and i != '}' and i != '[' and i != ']'):
             wynik = 0
     return wynik
+
 
 def czy_CT():
     wynik = 1
@@ -75,6 +78,7 @@ def czy_CT():
         i = i + 1
     return wynik
 
+
 def sprawdzanie_formatu():
     if (czy_BPseq() == 1):
         print("Jest to notacja bpseq")
@@ -85,9 +89,10 @@ def sprawdzanie_formatu():
     else:
         print("Błędne wejście")
 
-#=============Funkcje sprawdzajace do czego konwertowac ==================================
 
-def do_DotBracket ():
+# =============Funkcje sprawdzajace do czego konwertowac ==================================
+
+def do_DotBracket():
     if (czy_BPseq() == 1):
         z_BPseq_do_DotBracket()
     elif (czy_DotBracket() == 1):
@@ -97,7 +102,8 @@ def do_DotBracket ():
     else:
         print("Błędne wejście")
 
-def do_CT ():
+
+def do_CT():
     if (czy_BPseq() == 1):
         z_BPseq_do_CT()
     elif (czy_DotBracket() == 1):
@@ -107,7 +113,8 @@ def do_CT ():
     else:
         print("Błędne wejście")
 
-def do_BPseq ():
+
+def do_BPseq():
     if (czy_BPseq() == 1):
         print("To już jest notacja bpseq")
     elif (czy_DotBracket() == 1):
@@ -117,27 +124,98 @@ def do_BPseq ():
     else:
         print("Błędne wejście")
 
-#=============Funkcje konwertujace ========================================================
 
-def z_BPseq_do_DotBracket ():
+# =============Funkcje konwertujace ========================================================
+
+def z_BPseq_do_DotBracket():
     return 0
 
-def z_BPseq_do_CT ():
+
+def z_BPseq_do_CT():
+    nuk = linecache.getline(nazwa_czasteczki, 1)
+    nuk = nuk.split()
+
+    i = 1
+    nr_nuk = int(nuk[0]);
+    while (i == nr_nuk):
+        i = i + 1
+        nuk = linecache.getline(nazwa_czasteczki, i)
+        if (len(nuk) == 0):
+            nr_nuk = 0
+        else:
+            nr_nuk = int(nuk[0]);
+    dl = i - 1
+
+    i = 0
+    tab = []
+    while (i < (12 * dl + 2)):
+        tab.append(' ')
+        i = i + 1
+
+    tab[0] = dl
+    i = 0
+    j = 0
+    while (i < 12 * dl):
+        tab[i + 2] = tekst[j]
+        tab[i + 4] = tekst[j + 2]
+        if (int(tekst[j]) == 1):
+            tab[i + 6] = 0
+        else:
+            tab[i + 6] = int(tekst[j]) - 1
+        if (int(tekst[j]) == dl):
+            tab[i + 8] = 0
+        else:
+            tab[i + 8] = int(tekst[j]) + 1
+        tab[i + 10] = tekst[j + 4]
+        tab[i + 12] = tekst[j]
+        i = i + 12
+        j = j + 6
+
+    print("Konwersja do CT: ")
+    i = 0
+    print(tab[0])
+    while (i < 12 * dl):
+        print(tab[i + 2], tab[i + 4], tab[i + 6], tab[i + 8], tab[i + 10], tab[i + 12])
+        i = i + 12
+
+
+def z_CT_do_BPseq():
+    dl = int(tekst[0])
+    tab = []
+    i = 0
+    while (i < dl * 6):
+        tab.append('')
+        i = i + 1
+
+    i = 0
+    j = 0
+    while (i < dl * 6):
+        tab[i] = tekst[j + 2]
+        tab[i + 2] = tekst[j + 4]
+        tab[i + 4] = tekst[j + 10]
+        i = i + 6
+        j = j + 12
+
+    i = 0
+    print("Konwersja do BPSeq: ")
+    while (i < 6 * dl):
+        print(tab[i], tab[i + 2], tab[i + 4])
+        i = i + 6
+
+
+def z_CT_do_DotBracket():
     return 0
 
-def z_CT_do_BPseq ():
+
+def z_DotBracket_do_BPseq():
     return 0
 
-def z_CT_do_DotBracket ():
+
+def z_DotBracket_do_CT():
     return 0
 
-def z_DotBracket_do_BPseq ():
-    return 0
 
-def z_DotBracket_do_CT ():
-    return 0
-
-#=============Program ====================================================================
+# =============Program ====================================================================
 
 print("Czy chcesz zakończyć działanie programu? 0/tak 1/nie")
 wejscie = input()
@@ -167,6 +245,9 @@ while odp == 1:
     finally:
         plik.close()
 
+    print("Orginalny plik: ")
+    print(tekst)
+
     if (dzialanie == 1):
         sprawdzanie_formatu()
     elif (dzialanie == 2):
@@ -183,4 +264,3 @@ while odp == 1:
     print("Czy chcesz zakończyć działanie programu? 0/tak 1/nie")
     wejscie = input()
     odp = int(wejscie)
-
