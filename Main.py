@@ -3,6 +3,20 @@
 import linecache
 
 
+def min(a, b):
+    if (a < b):
+        return a
+    else:
+        return b
+
+
+def max(a, b):
+    if (a > b):
+        return a
+    else:
+        return b
+
+
 # =============Funkcje sprawdzajace format ================================================
 
 def czy_BPseq():
@@ -47,7 +61,8 @@ def czy_DotBracket():
         if (i != 'A' and i != 'C' and i != 'G' and i != 'U'):
             wynik = 0
     for i in kn:
-        if (i != '.' and i != '(' and i != ')' and i != '{' and i != '}' and i != '[' and i != ']'):
+        if (
+                                            i != '.' and i != '(' and i != ')' and i != '{' and i != '}' and i != '[' and i != ']' and i != '<' and i != '>'):
             wynik = 0
     return wynik
 
@@ -56,7 +71,8 @@ def czy_CT():
     wynik = 1
     dl = linecache.getline(nazwa_czasteczki, 1)
     dl = dl.strip()
-    if (len(dl) != 1):
+    if (len(dl) > 3):
+        print("jehehehehhe")
         return 0
     dl = dl.strip()
     i = 2
@@ -128,7 +144,49 @@ def do_BPseq():
 # =============Funkcje konwertujace ========================================================
 
 def z_BPseq_do_DotBracket():
-    return 0
+    wynik_sek = []
+    wynik_kn = []
+    nuk = linecache.getline(nazwa_czasteczki, 1)
+    nuk = nuk.split()
+
+    i = 1
+    nr_nuk = int(nuk[0]);
+    while (i == nr_nuk):
+        i = i + 1
+        nuk = linecache.getline(nazwa_czasteczki, i)
+        if (len(nuk) == 0):
+            nr_nuk = 0
+        else:
+            nr_nuk = int(nuk[0]);
+    dl = i-1
+
+    i = 0
+    while (i < dl):
+        wynik_sek.append(".")
+        wynik_kn.append(".")
+        i = i + 1
+
+    i = 0
+    j = 0
+    while (i < dl * 6):
+        wynik_sek[j] = tekst[i + 2]
+        i = i + 6
+        j = j + 1
+
+    i = 0
+    while (i < dl * 6):
+        j = 0
+        while (j < dl * 6):
+            licz = j + 4
+            if (tekst[licz] == tekst[i]):
+                wynik_kn[min(int(tekst[i]) - 1, int(tekst[j]) - 1)] = "("
+                wynik_kn[max(int(tekst[i]) - 1, int(tekst[j]) - 1)] = ")"
+            j = j + 6
+        i = i + 6
+
+    print("Konwersja do Dot-Bracket: ")
+    print("".join(wynik_sek))
+    print("".join(wynik_kn))
 
 
 def z_BPseq_do_CT():
@@ -204,15 +262,128 @@ def z_CT_do_BPseq():
 
 
 def z_CT_do_DotBracket():
-    return 0
+    wynik_sek = []
+    wynik_kn = []
+    dl = int(tekst[0])
+
+    i = 0
+    while (i < dl):
+        wynik_sek.append(".")
+        wynik_kn.append(".")
+        i = i + 1
+
+    i = 0
+    j = 0
+    while (j < dl):
+        wynik_sek[j] = tekst[i + 4]
+        i = i + 12
+        j = j + 1
+
+    z = 0
+    i = 0
+    while (z < dl):
+        licz1 = i + 2
+        j = 0
+        y = 0
+        while (y < dl):
+            licz2 = j + 10
+            if (tekst[licz1] == tekst[licz2]):
+                wynik_kn[min(int(tekst[i+2])-1, int(tekst[j+2])-1)] = "("
+                wynik_kn[max(int(tekst[i+2])-1, int(tekst[j+2])-1)] = ")"
+            j = j + 12
+            y = y + 1
+        i = i + 12
+        z = z + 1
+
+    print("Konwersja do Dot-Bracket: ")
+    print("".join(wynik_sek))
+    print("".join(wynik_kn))
 
 
 def z_DotBracket_do_BPseq():
-    return 0
+    sek = linecache.getline(nazwa_czasteczki, 1)
+    kn = linecache.getline(nazwa_czasteczki, 2)
+    kn2 = kn
+    dl = len(sek) - 1
+    tab = []
+    i = 0
+
+    while (i < dl * 6):
+        tab.append('-')
+        i = i + 1
+
+    i = 0
+    j = 0
+
+    while (i < dl * 6):
+        tab[i] = j + 1
+        tab[i + 2] = sek[j]
+        i = i + 6
+        j = j + 1
+
+    i = 0
+    j = 0
+    while (i<6*dl):
+        if (kn[j] == "."):
+            tab[i + 4] = 0
+        i = i + 6
+        j = j + 1
+
+
+    i = 0
+    print("Konwersja do BPSeq: ")
+    while (i < 6 * dl):
+        print(tab[i], tab[i + 2], tab[i + 4])
+        i = i + 6
 
 
 def z_DotBracket_do_CT():
-    return 0
+    sek = linecache.getline(nazwa_czasteczki, 1)
+    kn = linecache.getline(nazwa_czasteczki, 2)
+    kn2 = kn
+
+    dl = len(sek) - 1
+
+    tab = []
+    i = 0
+
+    while (i < (12 * dl + 2)):
+        tab.append('-')
+        i = i + 1
+
+    tab[0] = dl
+
+    i = 0
+    j = 0
+    while (i < 12 * dl):
+        tab[i + 2] = j + 1
+        tab[i + 4] = sek[j]
+        if (j + 1 == 1):
+            tab[i + 6] = 0
+        else:
+            tab[i + 6] = j
+        if (j + 1 == dl):
+            tab[i + 8] = 0
+        else:
+            tab[i + 8] = j + 2
+        tab[i + 12] = j + 1
+        i = i + 12
+        j = j + 1
+
+    i = 0
+    j = 0
+    while (i<12*dl):
+        if (kn[j] == "."):
+            tab[i + 10] = 0
+        i = i + 12
+        j = j + 1
+
+    print("Konwersja do CT: ")
+    i = 0
+    print(tab[0])
+    while (i < 12 * dl):
+        print(tab[i + 2], tab[i + 4], tab[i + 6], tab[i + 8], tab[i + 10], tab[i + 12])
+        i = i + 12
 
 
 # =============Program ====================================================================
